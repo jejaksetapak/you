@@ -1,0 +1,208 @@
+import React, { useState, useEffect } from 'react'
+import { Container, Form, Row, Col, Table, Button, Modal, Image } from 'react-bootstrap'
+import { API_URL } from '../config/constants';
+import swal from "sweetalert";
+import axios from 'axios'
+import BrandModalPage from './BrandModalPage';
+function BrandPage() {
+  const [AddShow, setAddShow] = useState(false);
+  const [EditShow, setEditShow] = useState(false);
+  const handleClose = () => setEditShow(false);
+  const [dataForm, setDataForm] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [brandName, setBrandName] = useState('');
+  const [brandLabel, setBrandLabel] = useState('');
+  const [brandPicName, setBrandPicName] = useState('');
+  const [brandPicTelp, setBrandPicTelp] = useState('');
+  const deleted = (data) => {
+    console.log(data)
+    swal({
+      title: "Sukses Masuk Keranjang",
+      text: "Sukses Masuk Keranjang ",
+      icon: "success",
+      button: false,
+      timer: 1500,
+    });
+  };
+  const editBrand = (data) => {
+    setDataForm(data);
+    setEditShow(true)
+  }
+  const list = () => {
+    axios.get(API_URL + 'brand')
+      .then(res => {
+        console.log(res);
+        setPosts(res.data);
+      }).catch(e => {
+      })
+  }
+  useEffect(() => {
+    list()
+  }, []);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(brandName);
+    const formData={
+      brandName: brandName,
+      brandLabel: brandLabel,
+      brandPicName: brandPicName,
+      brandPicTelp: brandPicTelp
+    };
+    console.log(formData);
+    axios.post(API_URL+'brand',formData).then(
+      res =>{
+        setAddShow(false)
+        list()
+      }
+    )
+
+  };
+  const handleSubmitUpdate = (event) => {
+    event.preventDefault();
+
+    console.log(brandName);
+
+    // axios.post(API_URL+'brand',contactInfo).then(
+    //   res =>{
+    //     setAddShow(false)
+    //     list()
+    //   }
+    // )
+
+  };
+
+  return (
+    <>
+      <div className='selected-col'>
+        <Container className="select-card-1">
+          <Row>
+            <Col lg={12} className="mb-3 mt-5 text-left">
+              <Button variant="success" className="btn-left" onClick={() => setAddShow(true)} >Tambah</Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={12}>
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Kode</th>
+                    <th>Label</th>
+                    {/* <th>Logo</th> */}
+                    <th>PIC Nama</th>
+                    <th>PIC Telp</th>
+                    <th>#</th>
+                    <th>#</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    posts.map((res, index) => (
+                      <tr key={res.id}>
+                        <td>{index + 1}</td>
+                        <td>{res.brandName}</td>
+                        <td>{res.brandLabel}</td>
+                        {/* <td>
+                          <Image src={res.brandImage} />
+                        </td> */}
+                        <td>{res.brandPicName}</td>
+                        <td>{res.brandPicTelp}</td>
+                        <td><Button variant='success' onClick={() => editBrand(res)}>Edit</Button></td>
+                        <td><Button variant='danger' onClick={() => deleted(res)}>Hapus</Button></td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </Table>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+      <Modal
+        show={AddShow}
+        onHide={() => setAddShow(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Add Form Data</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSubmit}>
+          <Modal.Body>
+            <Row>
+              <Col lg={12} sm={12}>
+                <Form.Group className="mb-3" controlId="formGroupEmail">
+                  <Form.Label>Kode</Form.Label>
+                  <input placeholder="Kode Brand"
+                    name="brandName"
+                    defaultValue={brandName}
+                    onChange={(e) => setBrandName(e.target.value)}
+                    type="text" id="formGroupEmail" className="form-control" required />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg={12} sm={12}>
+                <Form.Group className="mb-3" controlId="formGroupEmail">
+                  <Form.Label>Label</Form.Label>
+                  <Form.Control type="text"
+                    onChange={(e) => setBrandLabel(e.target.value)}
+                    defaultValue={brandLabel}
+                    name="brandLabel"
+                    placeholder="Label Brand" required />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg={12} sm={12}>
+                <Form.Group className="mb-3" controlId="formGroupEmail">
+                  <Form.Label>PIC Name</Form.Label>
+                  <Form.Control type="text"
+                    onChange={(e) => setBrandPicName(e.target.value)}
+                    defaultValue={brandPicName}
+                    name="brandPicName"
+                    placeholder="PIC Nam" required />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg={12} sm={12}>
+                <Form.Group className="mb-3" controlId="formGroupEmail">
+                  <Form.Label>PIC Telp</Form.Label>
+                  <Form.Control type="text"
+                    onChange={(e) => setBrandPicTelp(e.target.value)}
+                    defaultValue={brandPicTelp}
+                    name="brandPicTelp"
+                    placeholder="PIC Telp" required />
+                </Form.Group>
+              </Col>
+            </Row>
+            {/* <Row>
+              <Col lg={12} sm={12}>
+                <Form.Group className="mb-3" controlId="formGroupEmail">
+                  <Form.Label>Image Brand</Form.Label>
+                  <Form.Control type="file" size="sm" name="brandImage" onChange={handleFiles} />
+                </Form.Group>
+              </Col>
+            </Row> */}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="success" type="submit">
+              Simpan
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+      <BrandModalPage
+        handleShow={EditShow}
+        dataBrand={dataForm}
+        handleClose={handleClose}
+        handleSubmitUpdate={handleSubmitUpdate}
+        setBrandName={setBrandName}
+        setBrandLabel={setBrandLabel}
+        setBrandPicName={setBrandPicName}
+        setBrandPicTelp={setBrandPicTelp}
+      />
+    </>
+  )
+}
+
+export default BrandPage

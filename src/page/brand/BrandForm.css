@@ -1,0 +1,17 @@
+.image-preview{
+    width: 200px;
+    min-height: 200px;
+}
+.image-preview-grid{
+    width: 100px;
+}
+.active{
+    display: block;
+}
+.hidden-show{
+    display: none;
+}
+.text-red {
+    color: red;
+    font-size: 12px;
+}
